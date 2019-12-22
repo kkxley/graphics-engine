@@ -1,0 +1,13 @@
+.main {
+    display: flex;
+}
+
+.main div {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.main div label {
+    padding: 10px;
+}
