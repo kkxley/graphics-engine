@@ -7,11 +7,11 @@ import { draw } from './Utils';
 let startDegY = 0,
   startDegX = 0;
 
-let posY = 0,
-  posX = 0;
+let posY = 100,
+  posX = 100;
 Jquery(() => {
-  const graphical = new Graphical(Jquery('#canvas')[0].getContext('2d'));
-
+  const graphical = new Graphical(Jquery('#canvas')[0].getContext('2d'));  
+  graphical.setPosition(posX, posY);
   Jquery('.input-config').change(e => {
     const name = e.target.name;
 
@@ -31,7 +31,9 @@ Jquery(() => {
     }
     graphical.setPosition(posX, posY);
     draw(Cube, graphical, startDegX, startDegY);
+    graphical.showLight();
   });
 
   draw(Cube, graphical, startDegX, startDegY);
+  graphical.showLight();
 });

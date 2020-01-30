@@ -15,11 +15,22 @@ export default class Graphical {
   private posX:number = 0; 
   private posY:number = 0; 
   private ctx:any; 
-  
+  public light:Point = {x: 300, y: 300, z:  450};
+  public K:number = 0.8;
+  public I:number = 255;
+
   constructor(ctx) {
     this.ctx = ctx;
     this.ctx.fillStyle = '#252020';
     this.ctx.translate(0, 0);
+  }
+
+  showLight(){
+    let recomp = this.rotate(this.light);
+    let save = this.ctx.fillStyle;
+    this.ctx.fillStyle = `yellow`;
+    this.ctx.fillRect(recomp.x , recomp.y, 10, 10);
+    this.ctx.fillStyle = save;
   }
 
   setColor(color:string):void {
@@ -42,6 +53,13 @@ export default class Graphical {
     this.ctx.fillRect(x , y, 1, 1);
   }
 
+  dotColor(x:number, y:number, color:number) {
+    let save = this.ctx.fillStyle;
+    this.ctx.fillStyle = `rgb(${color}, ${color}, ${color})`;
+    this.ctx.fillRect(x , y, 10, 10);
+    this.ctx.fillStyle = save;
+  }
+
   setRotateX(deg:number):void {
     this.degX = (deg * Math.PI) / 180;
   }
@@ -61,15 +79,23 @@ export default class Graphical {
     return { x: xsh, y: ysh, z: zsh };
   }
 
-  fill(line1:Line, line2:Line, normal:number, color:string):void {
+  fill(line1:Line, line2:Line, normal:number, intensive):void {
     line1 = this.recompile(line1.from, line1.to);
     line2 = this.recompile(line2.from, line2.to);
 
+    
     if (this.renderCheck(line1, line2, normal)) return;
 
-    this.line(line1.from, line1.to, true, i =>
-      this.line(line2.from, line2.to, true, null, i)
+    this.line(line1.from, line1.to, [intensive[0], intensive[1], intensive[3], intensive[2]], true, (i, fromIntens, toIntensive) =>
+      this.line(line2.from, line2.to, [fromIntens, toIntensive], true, null, i)
     );
+
+    
+    this.dotColor(line1.from.x, line1.from.y, Math.ceil(intensive[0]));
+    this.dotColor(line1.to.x, line1.to.y, Math.ceil(intensive[1]));
+    this.dotColor(line2.from.x, line2.from.y, Math.ceil(intensive[3]));
+    this.dotColor(line2.to.x, line2.to.y, Math.ceil(intensive[2]));
+
   }
 
   renderCheck(edge1:Line, edge2:Line, normal:number):boolean {
@@ -84,7 +110,7 @@ export default class Graphical {
     return normal * k >= 0;
   }
 
-  line(point1:Point, point2:Point, fill:boolean = false, cb = null, stop:number = -1) {
+  line(point1:Point, point2:Point, intensive, fill:boolean = false, cb = null, stop:number = -1) {
     let dx = point2.x - point1.x;
     let dy = point2.y - point1.y;
 
